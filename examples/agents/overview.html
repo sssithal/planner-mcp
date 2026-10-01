@@ -1,0 +1,361 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>My Agent Week</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one calm column - week-at-a-glance grid up top, then one entry per agent, then the shared flow and rules. */
+:root {
+  --bg: #F5F6F3;
+  --surface: #FFFFFF;
+  --ink: #23292B;
+  --ink-soft: #5E6766;
+  --line: #DCE0DB;
+  --band: #E7EDE9;
+  --morning: #B7791F;
+  --wrap: #4A58B0;
+  --review: #1E7A6E;
+  --on-accent: #FFFFFF;
+  --display: "Young Serif", Georgia, serif;
+  --body: "Figtree", -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161A1B; --surface: #1E2324; --ink: #E9ECE8; --ink-soft: #A3ABA8;
+    --line: #333A3A; --band: #222B29;
+    --morning: #E0A84A; --wrap: #8E9BEB; --review: #5CC2B2; --on-accent: #141818;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161A1B; --surface: #1E2324; --ink: #E9ECE8; --ink-soft: #A3ABA8;
+  --line: #333A3A; --band: #222B29;
+  --morning: #E0A84A; --wrap: #8E9BEB; --review: #5CC2B2; --on-accent: #141818;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 16px; line-height: 1.55;
+  padding-inline: 20px; padding-block: 48px 72px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 56px; }
+
+header { display: grid; gap: 10px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 6vw, 46px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.lede { color: var(--ink-soft); max-width: 60ch; margin: 0; }
+
+h2 { font-family: var(--display); font-weight: 400; font-size: 24px; margin: 0 0 6px; text-wrap: balance; }
+.sub { color: var(--ink-soft); margin: 0 0 20px; max-width: 62ch; }
+
+/* ---------- Week grid ---------- */
+.week { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 16px 14px; overflow-x: auto; }
+.week-inner { display: grid; grid-template-columns: 44px repeat(5, minmax(56px, 1fr)); min-width: 360px; }
+.dayhead { font-size: 13px; font-weight: 600; text-align: center; padding-bottom: 8px; }
+.hours, .day { position: relative; height: 420px; } /* 7:00-17:00 -> 42px per hour */
+.hours span { position: absolute; right: 8px; transform: translateY(-50%); font-family: var(--mono); font-size: 11px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.day { border-left: 1px solid var(--line); }
+.day::before { /* work hours 8-4 */
+  content: ""; position: absolute; left: 0; right: 0; top: 42px; height: 336px; background: var(--band);
+}
+.gridline { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--line); }
+.evt {
+  position: absolute; left: 5px; right: 5px; height: 26px; transform: translateY(-50%);
+  border-radius: 6px; color: var(--on-accent); font-size: 11.5px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden;
+}
+.evt.m { background: var(--morning); }
+.evt.w { background: var(--wrap); }
+.evt.r { background: var(--review); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 14px; font-size: 13px; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.legend .band-key { background: var(--band); border: 1px solid var(--line); }
+
+/* ---------- Agent entries ---------- */
+.agents { display: grid; gap: 18px; }
+.agent { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 22px 22px 20px; display: grid; gap: 14px; }
+.agent-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.agent h3 { font-family: var(--display); font-weight: 400; font-size: 21px; margin: 0; display: flex; align-items: center; gap: 10px; }
+.dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.when { font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); }
+.agent p { margin: 0; color: var(--ink-soft); max-width: 64ch; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+.facts dt { font-size: 11.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 4px; }
+.facts dd { margin: 0; font-size: 14.5px; }
+.taskid { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.status { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--ink-soft); }
+
+/* ---------- Flow ---------- */
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+.step { position: relative; padding: 0 18px 0 0; }
+.step + .step { padding-left: 18px; border-left: 1px solid var(--line); }
+.step b { display: block; font-size: 15px; margin-bottom: 4px; }
+.step span { font-size: 14px; color: var(--ink-soft); }
+.step .n { font-family: var(--mono); font-size: 12px; color: var(--review); display: block; margin-bottom: 6px; }
+
+/* ---------- Rules ---------- */
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; margin: 0; padding: 0; list-style: none; }
+.rules li { padding-left: 18px; position: relative; color: var(--ink-soft); font-size: 15px; }
+.rules li::before { content: ""; position: absolute; left: 0; top: .62em; width: 7px; height: 7px; border-radius: 50%; background: var(--review); }
+.rules strong { color: var(--ink); font-weight: 600; }
+
+
+/* ---------- Architecture ---------- */
+.arch { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 16px 16px; }
+.arch-scroll { overflow-x: auto; }
+.arch svg { display: block; width: 100%; min-width: 560px; height: auto; color: var(--ink); font-family: var(--body); }
+.arch figcaption { margin-top: 12px; font-size: 14px; color: var(--ink-soft); max-width: 66ch; }
+.arch .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.arch .box.strong { stroke: currentColor; }
+.arch .group { fill: var(--band); stroke: var(--line); stroke-dasharray: 5 4; }
+.arch .t { fill: currentColor; font-size: 13.5px; font-weight: 600; }
+.arch .s { fill: var(--ink-soft); font-size: 11.5px; }
+.arch .lbl { fill: var(--ink-soft); font-size: 11.5px; font-family: var(--mono); }
+.arch .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.arch .ok { stroke: var(--review); stroke-width: 2.25; fill: none; }
+.arch .lbl.okl { fill: var(--review); font-weight: 500; }
+
+@media (max-width: 640px) {
+  body { padding-block: 32px 56px; padding-inline: 16px; }
+  .facts { grid-template-columns: 1fr; gap: 10px; }
+  .flow { grid-template-columns: 1fr; gap: 16px; }
+  .step, .step + .step { padding: 0 0 0 14px; border-left: 2px solid var(--line); }
+  .rules { grid-template-columns: 1fr; }
+  .evt { font-size: 10.5px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">planner-mcp &middot; example agents</div>
+    <h1>Three agents frame the workday. You decide what goes on the calendar.</h1>
+    <p class="lede">A morning brief helps you start the day, a wrap-up helps you close it, and a Friday review looks back at the week. All three read your calendar. The brief and wrap-up also see the subject lines of emails you've starred, and none of them changes anything without your OK.</p>
+  </header>
+
+  <section>
+    <h2>The week at a glance</h2>
+    <p class="sub">The shaded band shows example work hours, 8am to 4pm. On Fridays, the weekly review replaces the wrap-up, so you get one end-of-day message instead of two.</p>
+    <div class="week" role="img" aria-label="Weekly schedule: morning brief at about 7:30 Monday to Friday, wrap-up at 3:45 Monday to Thursday, weekly review at 3:00 on Friday.">
+      <div class="week-inner">
+        <div></div>
+        <div class="dayhead">Mon</div><div class="dayhead">Tue</div><div class="dayhead">Wed</div><div class="dayhead">Thu</div><div class="dayhead">Fri</div>
+        <div class="hours" id="hours"></div>
+        <div class="day" data-day="1"></div>
+        <div class="day" data-day="2"></div>
+        <div class="day" data-day="3"></div>
+        <div class="day" data-day="4"></div>
+        <div class="day" data-day="5"></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--morning)"></i>Morning brief</span>
+        <span><i style="background:var(--wrap)"></i>4pm wrap-up</span>
+        <span><i style="background:var(--review)"></i>Friday review</span>
+        <span><i class="band-key"></i>Work hours</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The agents</h2>
+    <p class="sub">Each agent starts fresh with only its saved instructions. Open the <strong>Scheduled</strong> section in the sidebar to pause one, edit it, or run it right away.</p>
+    <div class="agents">
+      <article class="agent">
+        <div class="agent-top">
+          <h3><span class="dot" style="background:var(--morning)"></span>Morning brief</h3>
+          <span class="when">Mon&ndash;Fri &middot; ~7:30 AM</span>
+        </div>
+        <p>A calm one-page summary of the day: how full it is, what needs you, and what's already handled. It ends by inviting you to brain-dump anything on your mind.</p>
+        <dl class="facts">
+          <div><dt>Reads</dt><dd>Calendar (today + tomorrow), starred-email subjects</dd></div>
+          <div><dt>Produces</dt><dd>A visual brief page</dd></div>
+          <div><dt>Task</dt><dd class="taskid">morning-check-in</dd></div>
+        </dl>
+      </article>
+
+      <article class="agent">
+        <div class="agent-top">
+          <h3><span class="dot" style="background:var(--wrap)"></span>4pm wrap-up</h3>
+          <span class="when">Mon&ndash;Thu &middot; 3:45 PM</span>
+        </div>
+        <p>A short close to the day. It covers what was planned today, up to three things that might carry over, and up to three suggested time blocks for tomorrow. It asks before adding any of them.</p>
+        <dl class="facts">
+          <div><dt>Reads</dt><dd>Calendar (today + tomorrow), starred-email subjects</dd></div>
+          <div><dt>Produces</dt><dd>A chat message</dd></div>
+          <div><dt>Task</dt><dd class="taskid">afternoon-wrap-up</dd></div>
+        </dl>
+      </article>
+
+      <article class="agent">
+        <div class="agent-top">
+          <h3><span class="dot" style="background:var(--review)"></span>Friday weekly review</h3>
+          <span class="when">Fri &middot; 3:00 PM</span>
+        </div>
+        <p>A kind look back at the week and a light look ahead. It notes patterns and suggests where focus time could go next week. Each review is saved as a private Notion page.</p>
+        <dl class="facts">
+          <div><dt>Reads</dt><dd>Calendar only (this week + next)</dd></div>
+          <div><dt>Produces</dt><dd>A private Notion page + link in chat</dd></div>
+          <div><dt>Task</dt><dd class="taskid">friday-weekly-review</dd></div>
+        </dl>
+      </article>
+
+      <article class="agent">
+        <div class="agent-top">
+          <h3><span class="dot" style="background:var(--ink-soft)"></span>Brain-dump &rarr; plan</h3>
+          <span class="status">On demand</span>
+        </div>
+        <p>Not scheduled. Paste a messy list any time, including as a reply to a brief or wrap-up. It gets sorted, sized, and matched to open time during your work hours, then you pick which blocks to add.</p>
+        <dl class="facts">
+          <div><dt>Reads</dt><dd>Your list, your calendar</dd></div>
+          <div><dt>Produces</dt><dd>Proposed time blocks</dd></div>
+          <div><dt>Writes</dt><dd>Only the events you approve</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it fits together</h2>
+    <p class="sub">Scheduled runs can read your calendar and the subject lines of starred emails, but they can't change anything. Events only get added through a live chat with you.</p>
+    <figure class="arch">
+      <div class="arch-scroll">
+      <svg viewBox="0 0 820 470" role="img" aria-label="Architecture: the Claude app scheduler fires three scheduled runs. They read your calendar and the subject lines of starred Gmail messages, send a brief page and chat message to you, and the weekly review creates a Notion page. Calendar events are only added when you reply yes in a live chat session.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+          <marker id="ah-ok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--review)"/></marker>
+        </defs>
+
+        <!-- Scheduler -->
+        <rect class="box strong" x="240" y="10" width="210" height="50" rx="8"/>
+        <text class="t" x="345" y="31" text-anchor="middle">Scheduler</text>
+        <text class="s" x="345" y="48" text-anchor="middle">Claude app &middot; runs while it's open</text>
+        <line class="edge" x1="345" y1="60" x2="345" y2="88" marker-end="url(#ah)"/>
+        <text class="lbl" x="355" y="79">fires on cron</text>
+
+        <!-- Scheduled runs group -->
+        <rect class="group" x="240" y="90" width="210" height="250" rx="10"/>
+        <text class="lbl" x="255" y="112">scheduled runs (read-only)</text>
+
+        <rect class="box" x="255" y="125" width="180" height="54" rx="7"/>
+        <circle cx="272" cy="152" r="5.5" style="fill:var(--morning)"/>
+        <text class="t" x="285" y="148">Morning brief</text>
+        <text class="s" x="285" y="165">Mon&ndash;Fri &middot; 7:30 AM</text>
+
+        <rect class="box" x="255" y="200" width="180" height="54" rx="7"/>
+        <circle cx="272" cy="227" r="5.5" style="fill:var(--wrap)"/>
+        <text class="t" x="285" y="223">4pm wrap-up</text>
+        <text class="s" x="285" y="240">Mon&ndash;Thu &middot; 3:45 PM</text>
+
+        <rect class="box" x="255" y="275" width="180" height="54" rx="7"/>
+        <circle cx="272" cy="302" r="5.5" style="fill:var(--review)"/>
+        <text class="t" x="285" y="298">Weekly review</text>
+        <text class="s" x="285" y="315">Fri &middot; 3:00 PM</text>
+
+        <!-- Sources -->
+        <rect class="box" x="20" y="110" width="170" height="50" rx="8"/>
+        <text class="t" x="105" y="131" text-anchor="middle">Gmail</text>
+        <text class="s" x="105" y="148" text-anchor="middle">starred &middot; subjects only</text>
+        <line class="edge" x1="190" y1="135" x2="238" y2="135" marker-end="url(#ah)"/>
+        <text class="lbl" x="214" y="127" text-anchor="middle">subjects</text>
+
+        <rect class="box" x="20" y="230" width="170" height="50" rx="8"/>
+        <text class="t" x="105" y="251" text-anchor="middle">Calendar</text>
+        <text class="s" x="105" y="268" text-anchor="middle">planner MCP</text>
+        <line class="edge" x1="190" y1="255" x2="238" y2="255" marker-end="url(#ah)"/>
+        <text class="lbl" x="214" y="247" text-anchor="middle">read</text>
+
+        <!-- Outputs -->
+        <rect class="box strong" x="620" y="140" width="150" height="110" rx="8"/>
+        <text class="t" x="695" y="190" text-anchor="middle">You</text>
+        <text class="s" x="695" y="207" text-anchor="middle">read, decide</text>
+
+        <line class="edge" x1="435" y1="152" x2="618" y2="152" marker-end="url(#ah)"/>
+        <text class="lbl" x="527" y="144" text-anchor="middle">brief page</text>
+        <line class="edge" x1="435" y1="227" x2="618" y2="227" marker-end="url(#ah)"/>
+        <text class="lbl" x="527" y="219" text-anchor="middle">chat message</text>
+
+        <rect class="box" x="620" y="280" width="150" height="45" rx="8"/>
+        <text class="t" x="695" y="299" text-anchor="middle">Notion</text>
+        <text class="s" x="695" y="315" text-anchor="middle">private page</text>
+        <line class="edge" x1="435" y1="302" x2="618" y2="302" marker-end="url(#ah)"/>
+        <text class="lbl" x="527" y="294" text-anchor="middle">creates page</text>
+        <line class="edge" x1="695" y1="280" x2="695" y2="252" marker-end="url(#ah)"/>
+        <text class="lbl" x="703" y="270">link</text>
+
+        <!-- Approval path: the only write to the calendar -->
+        <rect class="box" x="260" y="405" width="170" height="54" rx="8" style="stroke:var(--review)"/>
+        <text class="t" x="345" y="427" text-anchor="middle">Live chat with you</text>
+        <text class="s" x="345" y="444" text-anchor="middle">brain-dump &amp; approvals</text>
+
+        <polyline class="ok" points="770,195 800,195 800,432 432,432" marker-end="url(#ah-ok)"/>
+        <text class="lbl okl" x="615" y="424" text-anchor="middle">you reply &ldquo;yes&rdquo;</text>
+        <polyline class="ok" points="260,432 105,432 105,283" marker-end="url(#ah-ok)"/>
+        <text class="lbl okl" x="182" y="424" text-anchor="middle">adds approved events</text>
+      </svg>
+      </div>
+      <figcaption>Gray arrows are scheduled runs: they read your calendar and starred-email subject lines and send summaries to you. The weekly review doesn't read email at all. The teal path is the only way anything gets onto your calendar, and it only happens when you reply yes in a live chat.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>How a run works</h2>
+    <p class="sub">Every agent follows the same four steps. Your approval is always the last one.</p>
+    <div class="flow">
+      <div class="step"><span class="n">1 &middot; read</span><b>Gather</b><span>Calendar from Calendar.app, plus subject lines of emails you starred. All read-only.</span></div>
+      <div class="step"><span class="n">2 &middot; think</span><b>Sort</b><span>Find what needs you, what's handled, and where the open time is.</span></div>
+      <div class="step"><span class="n">3 &middot; write</span><b>Hand over</b><span>A brief, a chat message, or a Notion page.</span></div>
+      <div class="step"><span class="n">4 &middot; you</span><b>Approve</b><span>Reply "yes" to add blocks. Nothing changes until you do.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Good to know</h2>
+    <ul class="rules">
+      <li><strong>Agents only read.</strong> They never create, move, or delete events and never send email while you're away.</li>
+      <li><strong>The app needs to be open.</strong> If Claude is closed when a task is due, it runs the next time you open it.</li>
+      <li><strong>Click "Run now" once per agent.</strong> Approving its tools then means scheduled runs won't stop to ask for permission.</li>
+      <li><strong>Star an email to get a reminder.</strong> Agents see only the sender, subject, and date of starred emails. Unstar it when it's done.</li>
+      <li><strong>Agents never open emails.</strong> No message bodies, links, or attachments, so codes and hidden instructions stay out of reach.</li>
+      <li><strong>Approve read-only Gmail tools.</strong> On "Run now," allow search only. Deny send, forward, draft, and trash. That approval is the hard limit.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(function () {
+  var PX = 42, START = 7; // 7:00 at top, 42px per hour
+  var y = function (h, m) { return (h - START + (m || 0) / 60) * PX; };
+  var hours = document.getElementById('hours');
+  for (var h = 7; h <= 17; h++) {
+    var s = document.createElement('span');
+    s.style.top = y(h) + 'px';
+    s.textContent = (h > 12 ? h - 12 : h) + (h < 12 ? 'a' : 'p');
+    hours.appendChild(s);
+  }
+  var events = [
+    { days: [1,2,3,4,5], h: 7, m: 30, cls: 'm', label: 'Brief' },
+    { days: [1,2,3,4],   h: 15, m: 45, cls: 'w', label: 'Wrap-up' },
+    { days: [5],         h: 15, m: 0,  cls: 'r', label: 'Review' }
+  ];
+  document.querySelectorAll('.day').forEach(function (col) {
+    var d = +col.dataset.day;
+    for (var h = 8; h <= 16; h++) {
+      var g = document.createElement('div');
+      g.className = 'gridline'; g.style.top = y(h) + 'px';
+      col.appendChild(g);
+    }
+    events.forEach(function (e) {
+      if (e.days.indexOf(d) === -1) return;
+      var el = document.createElement('div');
+      el.className = 'evt ' + e.cls;
+      el.style.top = y(e.h, e.m) + 'px';
+      el.textContent = e.label;
+      col.appendChild(el);
+    });
+  });
+})();
+</script>

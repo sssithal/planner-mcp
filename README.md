@@ -37,3 +37,7 @@ On first use, the server compiles `calhelper.swift` into `.build/CalHelper.app` 
 ```bash
 python3 test_client.py
 ```
+
+## Example agents
+
+[`examples/agents/`](examples/agents/) has three scheduled agents built on this server: a morning brief, an afternoon wrap-up, and a Friday weekly review. They only read your calendar on a schedule, and events get added only when you approve them in a live chat. The folder also covers how to give an agent safe, limited access to Gmail.
