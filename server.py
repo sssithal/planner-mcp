@@ -90,9 +90,9 @@ on run argv
             set cname to name of c
             -- Bulk-fetch each property in one Apple Event; per-event access is very slow.
             set evs to a reference to (every event of c whose start date >= startD and start date < endD)
-            set {ts, ss, es, ads, locs} to {summary, start date, end date, allday event, location} of evs
+            set {ts, ss, es, ads, locs, ids} to {summary, start date, end date, allday event, location, uid} of evs
             repeat with i from 1 to count of ts
-                set out to out & cname & tab & my orEmpty(item i of ts) & tab & my fmt(item i of ss) & tab & my fmt(item i of es) & tab & (item i of ads as text) & tab & my orEmpty(item i of locs) & linefeed
+                set out to out & cname & tab & my orEmpty(item i of ts) & tab & my fmt(item i of ss) & tab & my fmt(item i of es) & tab & (item i of ads as text) & tab & my orEmpty(item i of locs) & tab & (item i of ids) & linefeed
             end repeat
         end repeat
     end tell
@@ -211,8 +211,9 @@ def list_events(start_date=None, end_date=None):
     except Exception as e:
         log("calhelper failed, falling back to AppleScript:", e)
     events = [
-        {"calendar": c, "title": t, "start": s, "end": e, "all_day": a == "true", "location": loc}
-        for c, t, s, e, a, loc in _osa(OSA_LIST_EVENTS, _minute(start_date), _minute(end_excl))
+        {"calendar": c, "title": t, "start": s, "end": e, "all_day": a == "true", "location": loc,
+         "id": uid}
+        for c, t, s, e, a, loc, uid in _osa(OSA_LIST_EVENTS, _minute(start_date), _minute(end_excl))
     ]
     return sorted(events, key=lambda ev: ev["start"])
 
@@ -228,6 +229,19 @@ def add_event(title, start, end=None, calendar=None, location=None, notes=None,
                         "" if reminder_minutes is None else str(int(reminder_minutes)))
     return {"created_in_calendar": cal, "uid": uid, "start": start_dt.isoformat(),
             "end": end_dt.isoformat()}
+
+
+def update_event(id, title=None, start=None, end=None, location=None, notes=None):
+    changes = {"title": title, "location": location, "notes": notes,
+               "start": start and _minute(start), "end": end and _minute(end)}
+    changes = {k: v for k, v in changes.items() if v is not None}
+    if not changes:
+        raise ValueError("nothing to change")
+    return _calhelper("update", id, json.dumps(changes))
+
+
+def delete_event(id):
+    return _calhelper("delete", id)
 
 
 def agenda(day=None):
@@ -258,6 +272,20 @@ TOOLS = {
         "reminder_minutes": {"type": "integer",
                              "description": "Alert this many minutes before the start"},
     }, ["title", "start"]),
+    "update_event": (update_event,
+        "Change one event: pass its id (from list_events, agenda or add_event's uid) and only the "
+        "fields to change. Moving the start keeps the event's length unless end is also given. "
+        "Repeating events and read-only calendars are refused.", {
+        "id": {"type": "string", "description": "The event's id"},
+        "title": {"type": "string"},
+        "start": {"type": "string", "description": "New ISO datetime, e.g. 2026-10-01T10:40"},
+        "end": {"type": "string", "description": "New ISO datetime"},
+        "location": {"type": "string"}, "notes": {"type": "string"},
+    }, ["id"]),
+    "delete_event": (delete_event,
+        "Delete one event by id. Only call this after the user has confirmed which event to "
+        "delete. Repeating events and read-only calendars are refused.",
+        {"id": {"type": "string", "description": "The event's id"}}, ["id"]),
     "list_calendars": (list_calendars,
         "List the user's calendars (iCloud, Google, etc.) and whether each is writable.", {}, []),
 }
@@ -273,7 +301,7 @@ def handle(msg):
             # Echo the client's version; this server only uses long-stable features.
             "protocolVersion": params.get("protocolVersion", "2025-06-18"),
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "planner-mcp", "version": "0.2.0"},
+            "serverInfo": {"name": "planner-mcp", "version": "0.3.0"},
             "instructions": f"Today's date is {date.today().isoformat()}. "
                             "These tools read and write the user's real calendars (iCloud, synced "
                             "with their iPhone). The user keeps reminders as calendar events with "

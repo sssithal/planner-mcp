@@ -1,6 +1,6 @@
 # planner-mcp
 
-A zero-dependency [MCP](https://modelcontextprotocol.io) server that lets Claude read and add events on your macOS calendar. Any account in Calendar.app (iCloud, Google, Exchange) works.
+A zero-dependency [MCP](https://modelcontextprotocol.io) server that lets Claude read, add, edit and delete events on your macOS calendar. Any account in Calendar.app (iCloud, Google, Exchange) works.
 
 ## Tools
 
@@ -10,6 +10,10 @@ A zero-dependency [MCP](https://modelcontextprotocol.io) server that lets Claude
 | `list_events` | Lists events between two dates |
 | `agenda` | Lists one day's events (defaults to today) |
 | `add_event` | Creates an event, optionally with a reminder alert |
+| `update_event` | Changes an event's title, time, location or notes |
+| `delete_event` | Deletes an event |
+
+`update_event` and `delete_event` only touch single, non-repeating events on writable calendars, so a mistake can't wipe out a whole series or a shared calendar.
 
 ## Requirements
 
